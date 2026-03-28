@@ -1,11 +1,11 @@
 [project]
-name = "template"  # The pip install <name>.
+name = "robot-control"  # The pip install <name>.
 version = "0.1.0"
-description = "Template for repos that are intended to be packaged libraries."
+description = "Control a robot."
 readme = "README.md"
 authors = [{ name = "Eric Apgar" }]
-urls = { "Homepage" = "https://github.com/EricApgar/template" }
-requires-python = "~=3.13.0"
+urls = { "Homepage" = "https://github.com/EricApgar/robot-control" }
+requires-python = "~=3.12.0"
 
 # Examples of dependency types.
 # dependencies = [
@@ -61,4 +61,4 @@ package-dir = {"" = "src"}  # Important that this folder is the name of the fold
 
 [tool.setuptools.packages.find]
 where = ["src"]
-# include = ["template*"]  # The import <name>. Defined by the name of the folder under src.
+# include = ["robot_control*"]  # The import <name>. Defined by the name of the folder under src.
