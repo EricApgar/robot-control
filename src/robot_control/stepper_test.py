@@ -2,8 +2,8 @@ import time
 from adafruit_motorkit import MotorKit
 from adafruit_motor import stepper
 
-STEPS_PER_REV = 200  # Steps for one full rotation (1.8 deg/step). Adjust if needed.
-STEP_DELAY = 0.01    # Seconds between steps.
+STEPS_PER_REV = 400  # Half-steps per revolution in INTERLEAVE mode (200 full steps * 2).
+STEP_DELAY = 0.02    # Seconds between steps. Increase if motor misses steps.
 
 kit = MotorKit()
 
@@ -11,7 +11,7 @@ kit = MotorKit()
 def rotate(direction: int, steps: int) -> None:
     """Step the motor in the given direction for the given number of steps."""
     for _ in range(steps):
-        kit.stepper2.onestep(direction=direction, style=stepper.SINGLE)
+        kit.stepper2.onestep(direction=direction, style=stepper.INTERLEAVE)
         time.sleep(STEP_DELAY)
 
 
