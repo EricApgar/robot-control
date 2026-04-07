@@ -3,7 +3,7 @@ from adafruit_motorkit import MotorKit
 from adafruit_motor import stepper
 
 STEPS_PER_REV = 400  # Half-steps per revolution in INTERLEAVE mode (200 full steps * 2).
-STEP_DELAY = 0.02    # Seconds between steps. Increase if motor misses steps.
+STEP_DELAY = 0.05    # Seconds between steps. Increase if motor misses steps.
 
 kit = MotorKit()
 
