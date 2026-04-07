@@ -3,8 +3,8 @@ import time
 from adafruit_motorkit import MotorKit
 from adafruit_motor import stepper
 
-STEPS_PER_REV = 400  # Half-steps per revolution in INTERLEAVE mode (200 full steps * 2).
-RPM = 2.0            # Target speed in revolutions per minute.
+STEPS_PER_REV = 3200  # Microsteps per revolution in MICROSTEP mode (200 full steps * 16).
+RPM = 2.0             # Target speed in revolutions per minute.
 
 STEP_DELAY = 60.0 / (RPM * STEPS_PER_REV)  # Seconds per step.
 
@@ -17,7 +17,7 @@ def rotate(direction: int, steps: int) -> None:
     for _ in range(steps):
         while time.monotonic() < next_step:
             pass
-        kit.stepper2.onestep(direction=direction, style=stepper.INTERLEAVE)
+        kit.stepper2.onestep(direction=direction, style=stepper.MICROSTEP)
         next_step += STEP_DELAY
 
 
