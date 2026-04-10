@@ -6,7 +6,7 @@ from adafruit_motorkit import MotorKit
 from adafruit_motor import stepper
 
 STEPS_PER_REV = 3200        # Microsteps per revolution in MICROSTEP mode.
-RPM = 2.0
+RPM = 10.0
 STEP_DELAY = 60.0 / (RPM * STEPS_PER_REV)
 TOLERANCE_DEGREES = 0.5     # Stop stepping when within this many degrees of target.
 
