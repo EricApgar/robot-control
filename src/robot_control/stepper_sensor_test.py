@@ -52,8 +52,8 @@ def move_to(target_degrees: float) -> None:
 
 print("Starting stepper + sensor test. Zeroing at current position...")
 
-move_to(5.0)
-move_to(-5.0)
+move_to(10.0)
+move_to(-10.0)
 move_to(0.0)
 
 kit.stepper2.release()
