@@ -22,7 +22,7 @@ while True:
     elif delta < -180:
         delta += 360
 
-    cumulative += delta
+    cumulative += delta * 360 / 4096
     previous = current
 
     print(f"\rAngle: {cumulative:+.1f} degrees", end="", flush=True)
