@@ -106,7 +106,8 @@ def test_homing() -> None:
 
 
 # --- Run test ---
-test_homing()
-
-kit.stepper2.release()
-print("Done.")
+try:
+    test_homing()
+finally:
+    kit.stepper2.release()
+    print("Motor released.")
