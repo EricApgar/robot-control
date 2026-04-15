@@ -25,10 +25,13 @@ while True:
     else:
         status = "Good"
 
+    raw = sensor.raw_angle
+    degrees = raw * 360 / 4096
+
     lines = [
         f"Magnet Status: {status}",
-        f"Raw Angle:     {sensor.raw_angle}",
-        f"Scaled Angle:  {sensor.angle:.2f}",
+        f"Raw Angle:     {raw}",
+        f"Scaled Angle:  {degrees:.2f}°",
         f"Magnitude:     {sensor.magnitude}",
     ]
 
