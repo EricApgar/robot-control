@@ -6,24 +6,35 @@ import adafruit_as5600
 i2c = busio.I2C(board.SCL, board.SDA)
 sensor = adafruit_as5600.AS5600(i2c)
 
-print("Reading AS5600 angle. Move a magnet near the sensor (Ctrl+C to stop)...")
+print("Reading AS5600 sensor (Ctrl+C to stop)...")
 print()
 
-previous = sensor.angle
-cumulative = 0.0
+# Print initial blank lines so the cursor-up trick works from the first iteration
+print("Magnet Status: ")
+print("Raw Angle:     ")
+print("Scaled Angle:  ")
+print("Magnitude:     ")
 
 while True:
-    current = sensor.angle
-    delta = current - previous
+    if not sensor.magnet_detected:
+        status = "Missing"
+    elif sensor.min_gain_overflow:
+        status = "Too strong"
+    elif sensor.max_gain_overflow:
+        status = "Too weak"
+    else:
+        status = "Good"
 
-    # Unwrap: if the raw jump is >180 the sensor crossed the 0/360 boundary.
-    if delta > 180:
-        delta -= 360
-    elif delta < -180:
-        delta += 360
+    lines = [
+        f"Magnet Status: {status}",
+        f"Raw Angle:     {sensor.raw_angle}",
+        f"Scaled Angle:  {sensor.angle:.2f}",
+        f"Magnitude:     {sensor.magnitude}",
+    ]
 
-    cumulative += delta * 360 / 4096
-    previous = current
+    # Move cursor up 4 lines, then overwrite each line
+    print("\033[4A", end="")
+    for line in lines:
+        print(f"\r{line}\033[K")
 
-    print(f"\rAngle: {cumulative:+.1f} degrees", end="", flush=True)
     time.sleep(0.1)
