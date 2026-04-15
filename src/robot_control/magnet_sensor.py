@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 import time
 
+import busio
+import board
 import adafruit_as5600
 
 
@@ -14,10 +16,13 @@ class SensorValues:
 
 
 class MagnetSensor:
-    
-    def __init__(self):
+    '''
+    Class for working with Adafruit AS5600 magnetic orientation sensor.
+    '''
+
+    def __init__(self, i2c: busio.I2C=busio.I2C(board.SCL, board.SDA)):
         
-        self.sensor = adafruit_as5600.AS5600(i2c=self.i2c)
+        self.sensor = adafruit_as5600.AS5600(i2c=i2c)
 
 
     def read(self):

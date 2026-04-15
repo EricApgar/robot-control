@@ -43,11 +43,15 @@ class Stepper:
 
         self.limits = None
 
+        self.cw = stepper.FORWARD
+        self.ccw = stepper.BACKWARD
+
 
     def zero(self):
         '''
         Sweep CW and CCW to find limits. Set Limits.
         '''
+
         dir_name = "right" if direction == stepper.FORWARD else "left"
         print(f"Sweeping to {dir_name} limit...")
         next_step = time.monotonic()
@@ -64,7 +68,24 @@ class Stepper:
                 print(f"  {dir_name.capitalize()} limit: {limit:+.1f} degrees")
                 return limit
         return
-    
+
+
+    def flip(self):
+        '''
+        Internally flips cw and ccw so that you can set this once for a motor
+        and not have to keep track of which motor needs to be always cw and which
+        needs to be ccw if the motors are oriented differently.
+        '''
+
+        if self.cw == stepper.FORWARD:
+            self.cw == stepper.BACKWARD
+            self.ccw == stepper.FORWARD
+        else:
+            self.cw == stepper.FORWARD
+            self.ccw == stepper.BACKWARD
+
+        return
+
 
     def turn_to(self, direction: Literal['cw', 'ccw']='cw', percent: float=0.0):
         '''
@@ -75,7 +96,8 @@ class Stepper:
         '''
 
         return
-    
+
+
     def turn_by(self, direction: Literal['cw', 'ccw']='cw', revolutions: float=0.0):
         '''
         On the off chance that a sensor is not available or not used, turn the motor
