@@ -41,7 +41,7 @@ class Stepper:
         self.kit = MotorKit(i2c=self.i2c)
         self.sensor = adafruit_as5600.AS5600(i2c=self.i2c)
 
-        self.limits = None
+        self.limits: Limits = None
 
         self.cw = stepper.FORWARD
         self.ccw = stepper.BACKWARD

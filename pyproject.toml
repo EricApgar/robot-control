@@ -20,6 +20,7 @@ requires-python = "~=3.12.0"
 # ]
 
 dependencies = [
+    "adafruit-circuitpython-as5600>=1.0.2",
     "adafruit-circuitpython-motorkit>=1.6.20",
     "gpiozero>=2.0.1",
     "lgpio>=0.2.2.0",

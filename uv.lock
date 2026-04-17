@@ -20,6 +20,20 @@ wheels = [
 ]
 
 [[package]]
+name = "adafruit-circuitpython-as5600"
+version = "1.0.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "adafruit-blinka" },
+    { name = "adafruit-circuitpython-busdevice" },
+    { name = "adafruit-circuitpython-register" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/92/ca/724822fdb6fc559d172fec9d6eebd7213b74c055346251f1a99db5459d0b/adafruit_circuitpython_as5600-1.0.2.tar.gz", hash = "sha256:246dd74d4b062bc3b0e1ce012f6ea61ece51a8b369c141d9d179f140776d90ce", size = 26628, upload-time = "2026-03-27T18:56:34.417Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/68/6e/b29b84752ccaa82ed677507b76c42b3fde7c9893168292e2f65c363037d6/adafruit_circuitpython_as5600-1.0.2-py3-none-any.whl", hash = "sha256:002acf8f9ebb10ab9b2b6f6632c6c53173a3dfef19a11372b550264201e260ce", size = 6570, upload-time = "2026-03-27T18:56:33.705Z" },
+]
+
+[[package]]
 name = "adafruit-circuitpython-busdevice"
 version = "5.2.16"
 source = { registry = "https://pypi.org/simple" }
@@ -230,6 +244,7 @@ name = "robot-control"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "adafruit-circuitpython-as5600" },
     { name = "adafruit-circuitpython-motorkit" },
     { name = "gpiozero" },
     { name = "lgpio" },
@@ -238,6 +253,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "adafruit-circuitpython-as5600", specifier = ">=1.0.2" },
     { name = "adafruit-circuitpython-motorkit", specifier = ">=1.6.20" },
     { name = "gpiozero", specifier = ">=2.0.1" },
     { name = "lgpio", specifier = ">=0.2.2.0" },
