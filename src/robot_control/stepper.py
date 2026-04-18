@@ -1,7 +1,11 @@
 '''
-Class for stepper motor.
+Class for stepper motor specifically designed for working with
+the "Adafruit DC and Stepper Motor HAT for Raspberry Pi".
+
+https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi/using-stepper-motors
 '''
 from dataclasses import dataclass
+from types import SimpleNamespace
 import time
 from typing import Literal
 
@@ -12,13 +16,10 @@ from adafruit_motorkit import MotorKit
 from adafruit_motor import stepper
 
 
-@dataclass
-class Limits:
-    cw: int
-    ccw: int
-    midpoint: int
-
-
+# Realistically, a user needs to be able to update these constants for their
+# specific type of stepper motor that they connect to the HAT. This class is
+# really a "AdafruitMotorHatStepper()" class, and so the motor details need
+# to be adjustable for whatever you connect.
 @dataclass(frozen=True)
 class Constants:
     STEPS_PER_REV: int = 3200  # Microsteps per revolution in MICROSTEP mode.
@@ -34,23 +35,48 @@ class Constants:
 
 
 class Stepper:
+    '''
+    Control a stepper motor via the Adafruit DC/Stepper Motor HAT for RPi.
 
-    def __init__(self):
-        
-        self.i2c = busio.I2C(board.SCL, board.SDA)
-        self.kit = MotorKit(i2c=self.i2c)
-        self.sensor = adafruit_as5600.AS5600(i2c=self.i2c)
+    If sensor feedback is included, use it to when determining motion.
+    Otherwise, do your best guess based on math.
+    '''
 
-        self.limits: Limits = None
+    def __init__(self,
+        i2c: busio.I2C=busio.I2C(board.SCL, board.SDA),
+        terminal: int=1,  # Terminal 1 = M1/M2, Termainal 2 = M3/M4.
+        ):  # Optionally use AS5600 sensor for positioning.
 
-        self.cw = stepper.FORWARD
-        self.ccw = stepper.BACKWARD
+        if terminal == 1:
+            self.motor = MotorKit(i2c=i2c).stepper1
+        elif terminal == 2:
+            self.motor = MotorKit(i2c=i2c).stepper2
+        else:
+            raise ValueError(f'Input arg "terminal" must be 1 or 2! (was {terminal})')
+
+        self.directions = SimpleNamespace(
+            cw=stepper.FORWARD,
+            ccw=stepper.BACKWARD)
+
+        self.sensor: adafruit_as5600.AS5600 = None
+        self.limits: SimpleNamespace = None  # Only set if sensor is available.
+
+
+    def add_sensor(self, sensor: adafruit_as5600.AS5600):
+
+        self.sensor = sensor
+
+        return
 
 
     def zero(self):
         '''
         Sweep CW and CCW to find limits. Set Limits.
+        Sweep may cross reset point so deal with that.
         '''
+
+        if not self.sensor:
+            raise ValueError('Must have connected sensor! See "add_sensor()".')
 
         dir_name = "right" if direction == stepper.FORWARD else "left"
         print(f"Sweeping to {dir_name} limit...")
@@ -60,7 +86,7 @@ class Stepper:
             for _ in range(LIMIT_STEPS_PER_CHECK):
                 while time.monotonic() < next_step:
                     pass
-                kit.stepper2.onestep(direction=direction, style=stepper.MICROSTEP)
+                self.kit.stepper2.onestep(direction=direction, style=stepper.MICROSTEP)
                 next_step += STEP_DELAY
             angle_after = read_angle()
             if abs(angle_after - angle_before) < LIMIT_MOVEMENT_THRESHOLD:
@@ -77,12 +103,12 @@ class Stepper:
         needs to be ccw if the motors are oriented differently.
         '''
 
-        if self.cw == stepper.FORWARD:
-            self.cw == stepper.BACKWARD
-            self.ccw == stepper.FORWARD
+        if self.directions.cw == stepper.FORWARD:
+            self.directions.cw == stepper.BACKWARD
+            self.directions.ccw == stepper.FORWARD
         else:
-            self.cw == stepper.FORWARD
-            self.ccw == stepper.BACKWARD
+            self.directions.cw == stepper.FORWARD
+            self.directions.ccw == stepper.BACKWARD
 
         return
 
@@ -98,10 +124,48 @@ class Stepper:
         return
 
 
-    def turn_by(self, direction: Literal['cw', 'ccw']='cw', revolutions: float=0.0):
+    def turn_for(self, direction: Literal['cw', 'ccw']='cw', revolutions: float=0.0):
         '''
         On the off chance that a sensor is not available or not used, turn the motor
         by telling it to turn in fractions or multiples of a revolution.
         '''
+
+        return
+    
+    def turn_by():
+
+        return
+    
+
+    def turn(self,
+        speed: float=.5,
+        direction: Literal['cw', 'ccw']='cw'):
+        '''
+        Different ways we can turn:
+        time: turn for x seconds.
+        revolutions: turn for x revolutions.
+            -If no sensor, calculate number of steps required for full revolution.
+            -If sensor, turn until revolutions reached. First determine that that revolutions within range.
+        percentage: turn x percent of total ability in a direction.
+            -Sensor dependent.
+            -Only valid if limits are set.
+            -Ex: turn 20% (of total) ccw. O% in either direction is reset to midpoint.
+
+        Things that influence turning:
+        -Speed (as a percentage of total top speed).
+        -Direction.
+
+
+        Determine if you have a sensor.
+        '''
+        return
+
+
+    def step(self, direction: Literal['cw', 'ccw']='cw', count: int=100):
+
+        direction = getattr(self.directions, direction)
+
+        for _ in range(count):
+            self.motor.onestep(direction=direction, style=stepper.MICROSTEP)
 
         return
