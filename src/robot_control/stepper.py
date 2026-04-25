@@ -62,6 +62,19 @@ class Stepper:
         self.limits: SimpleNamespace = None  # Only set if sensor is available.
 
 
+    def release(self):
+        '''
+        Release motor coils from holding energy. This is exposed to the user to give
+        them a way to actively shut everything down if they try something and things
+        aren't working and your panicking because the motor is unresponsive and just
+        keeps whining and getting hotter and hotter...
+        '''
+
+        self.motor.release()
+
+        return
+
+
     def add_sensor(self, sensor: adafruit_as5600.AS5600):
 
         self.sensor = sensor
@@ -131,7 +144,8 @@ class Stepper:
         '''
 
         return
-    
+
+
     def turn_by():
 
         return
@@ -161,11 +175,23 @@ class Stepper:
         return
 
 
-    def step(self, direction: Literal['cw', 'ccw']='cw', count: int=100):
+    def step(self, direction: Literal['cw', 'ccw']='cw', count: int=100, speed: float=None, hold: bool=False):
+        '''
+        Options for style:
+        
+        stepper.SINGLE: works as expected.
+        stepper.DOUBLE: continuous tiny oscillations between cw and ccw until actively killed.
+        stepper.INTERLEAVE: continuous tiny oscillations between cw and ccw until actively killed.
+        stepper.MICROSTEP: motor whines continuously until actively killed and does not turn at all.
+        '''
+
 
         direction = getattr(self.directions, direction)
 
         for _ in range(count):
-            self.motor.onestep(direction=direction, style=stepper.MICROSTEP)
+            self.motor.onestep(direction=direction, style=stepper.SINGLE)
+
+        if not hold:
+            self.motor.release()
 
         return
