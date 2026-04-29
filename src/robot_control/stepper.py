@@ -175,23 +175,40 @@ class Stepper:
         return
 
 
-    def step(self, direction: Literal['cw', 'ccw']='cw', count: int=100, speed: float=None, hold: bool=False):
+    def step(self,
+        direction: Literal['cw', 'ccw']='cw',
+        count: int=100,
+        style: str='',
+        speed: float=None,
+        hold: bool=False):
         '''
         Options for style:
         
-        stepper.SINGLE: works as expected.
-        stepper.DOUBLE: continuous tiny oscillations between cw and ccw until actively killed.
-        stepper.INTERLEAVE: continuous tiny oscillations between cw and ccw until actively killed.
-        stepper.MICROSTEP: motor whines continuously until actively killed and does not turn at all.
+        stepper.SINGLE: jerky, intermittent. doesn't work as expected.
+        stepper.DOUBLE: works.
+        stepper.INTERLEAVE: works.
+        stepper.MICROSTEP: works - very tiny steps.
         '''
 
 
         direction = getattr(self.directions, direction)
 
+        if style == 's':
+            style = stepper.SINGLE
+        elif style == 'd':
+            style = stepper.DOUBLE
+        elif style == 'i':
+            style = stepper.INTERLEAVE
+        elif style == 'm':
+            style = stepper.MICROSTEP
+        else:
+            raise ValueError('Unsupported style.')
+
         for _ in range(count):
-            self.motor.onestep(direction=direction, style=stepper.SINGLE)
+            self.motor.onestep(direction=direction, style=style)
 
         if not hold:
             self.motor.release()
 
         return
+
