@@ -116,12 +116,7 @@ class Stepper:
         needs to be ccw if the motors are oriented differently.
         '''
 
-        if self.directions.cw == stepper.FORWARD:
-            self.directions.cw == stepper.BACKWARD
-            self.directions.ccw == stepper.FORWARD
-        else:
-            self.directions.cw == stepper.FORWARD
-            self.directions.ccw == stepper.BACKWARD
+        self.directions.cw, self.directions.ccw = self.directions.ccw, self.directions.cw
 
         return
 
