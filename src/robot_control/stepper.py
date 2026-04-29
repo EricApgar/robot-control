@@ -4,14 +4,18 @@ the "Adafruit DC and Stepper Motor HAT for Raspberry Pi".
 
 https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi/using-stepper-motors
 '''
+from __future__ import annotations
+
 from dataclasses import dataclass
 from types import SimpleNamespace
 import time
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
+
+if TYPE_CHECKING:
+    from robot_control.magnet_sensor import MagnetSensor
 
 import board
 import busio
-import adafruit_as5600
 from adafruit_motorkit import MotorKit
 from adafruit_motor import stepper
 
@@ -58,7 +62,7 @@ class Stepper:
             cw=stepper.FORWARD,
             ccw=stepper.BACKWARD)
 
-        self.sensor: adafruit_as5600.AS5600 = None
+        self.sensor: MagnetSensor = None
         self.limits: SimpleNamespace = None  # Only set if sensor is available.
 
 
@@ -75,7 +79,7 @@ class Stepper:
         return
 
 
-    def add_sensor(self, sensor: adafruit_as5600.AS5600):
+    def add_sensor(self, sensor: MagnetSensor):
 
         self.sensor = sensor
 
@@ -91,21 +95,6 @@ class Stepper:
         if not self.sensor:
             raise ValueError('Must have connected sensor! See "add_sensor()".')
 
-        dir_name = "right" if direction == stepper.FORWARD else "left"
-        print(f"Sweeping to {dir_name} limit...")
-        next_step = time.monotonic()
-        while True:
-            angle_before = read_angle()
-            for _ in range(LIMIT_STEPS_PER_CHECK):
-                while time.monotonic() < next_step:
-                    pass
-                self.kit.stepper2.onestep(direction=direction, style=stepper.MICROSTEP)
-                next_step += STEP_DELAY
-            angle_after = read_angle()
-            if abs(angle_after - angle_before) < LIMIT_MOVEMENT_THRESHOLD:
-                limit = read_angle()
-                print(f"  {dir_name.capitalize()} limit: {limit:+.1f} degrees")
-                return limit
         return
 
 
@@ -173,7 +162,7 @@ class Stepper:
     def step(self,
         direction: Literal['cw', 'ccw']='cw',
         count: int=100,
-        style: str='',
+        style: str='d',
         speed: float=None,
         hold: bool=False):
         '''
@@ -188,9 +177,9 @@ class Stepper:
 
         direction = getattr(self.directions, direction)
 
-        if style == 's':
-            style = stepper.SINGLE
-        elif style == 'd':
+        # if style == 's':  # NOT CURRENTLY WORKING.
+        #     style = stepper.SINGLE
+        if style == 'd':
             style = stepper.DOUBLE
         elif style == 'i':
             style = stepper.INTERLEAVE
