@@ -15,7 +15,7 @@ class SensorValues:
     magnitude: float
 
 
-class MagnetSensor:
+class AS5600Sensor:
     '''
     Class for working with Adafruit AS5600 magnetic orientation sensor.
     '''
