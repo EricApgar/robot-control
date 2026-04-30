@@ -12,7 +12,7 @@ import time
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
-    from robot_control.magnet_sensor import MagnetSensor
+    from robot_control.as5600_sensor import AS5600Sensor
 
 import board
 import busio
@@ -48,8 +48,8 @@ class Stepper:
 
     def __init__(self,
         i2c: busio.I2C=busio.I2C(board.SCL, board.SDA),
-        terminal: int=1,  # Terminal 1 = M1/M2, Termainal 2 = M3/M4.
-        ):  # Optionally use AS5600 sensor for positioning.
+        terminal: int=2,  # Terminal 1 = M1/M2, Termainal 2 = M3/M4.
+        sensor: AS5600Sensor=None):  # Optionally use AS5600 sensor for positioning.
 
         if terminal == 1:
             self.motor = MotorKit(i2c=i2c).stepper1
@@ -62,7 +62,7 @@ class Stepper:
             cw=stepper.FORWARD,
             ccw=stepper.BACKWARD)
 
-        self.sensor: MagnetSensor = None
+        self.sensor: AS5600Sensor = sensor
         self.limits: SimpleNamespace = None  # Only set if sensor is available.
 
 
@@ -79,7 +79,7 @@ class Stepper:
         return
 
 
-    def add_sensor(self, sensor: MagnetSensor):
+    def add_sensor(self, sensor: AS5600Sensor):
 
         self.sensor = sensor
 
@@ -88,12 +88,15 @@ class Stepper:
 
     def zero(self):
         '''
-        Sweep CW and CCW to find limits. Set Limits.
+        Sweep CW and CCW to find limits. Set Limits. Move to Midpoint.
         Sweep may cross reset point so deal with that.
         '''
 
         if not self.sensor:
             raise ValueError('Must have connected sensor! See "add_sensor()".')
+
+        # Assume that you're somewhat in the middle and there is room to sweep to either side.
+
 
         return
 
@@ -106,6 +109,8 @@ class Stepper:
         '''
 
         self.directions.cw, self.directions.ccw = self.directions.ccw, self.directions.cw
+
+        # TODO: Flip sensor limits as well.
 
         return
 
@@ -162,7 +167,7 @@ class Stepper:
     def step(self,
         direction: Literal['cw', 'ccw']='cw',
         count: int=100,
-        style: str='d',
+        mode: str='d',
         speed: float=None,
         hold: bool=False):
         '''
@@ -177,19 +182,24 @@ class Stepper:
 
         direction = getattr(self.directions, direction)
 
-        # if style == 's':  # NOT CURRENTLY WORKING.
-        #     style = stepper.SINGLE
-        if style == 'd':
-            style = stepper.DOUBLE
-        elif style == 'i':
-            style = stepper.INTERLEAVE
-        elif style == 'm':
-            style = stepper.MICROSTEP
+        # if mode == 's':  # NOT CURRENTLY WORKING.
+        #     mode = stepper.SINGLE
+        if mode == 'd':
+            mode = stepper.DOUBLE
+        elif mode == 'i':
+            mode = stepper.INTERLEAVE
+        elif mode == 'm':
+            mode = stepper.MICROSTEP
         else:
-            raise ValueError('Unsupported style.')
+            raise ValueError('Unsupported mode.')
 
+        constants = Constants()
+        next_step = time.monotonic()
         for _ in range(count):
-            self.motor.onestep(direction=direction, style=style)
+            while time.monotonic() < next_step:
+                pass
+            self.motor.onestep(direction=direction, style=mode)
+            next_step += constants.STEP_DELAY
 
         if not hold:
             self.motor.release()
