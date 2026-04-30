@@ -7,9 +7,6 @@ Sweeps the motor between MIN_DEGREES and MAX_DEGREES (absolute sensor angle,
 Run from VS Code Remote SSH - matplotlib will display in VS Code's Plots panel.
 Kill with Ctrl+C; the motor is released in the finally block.
 '''
-import matplotlib
-matplotlib.use('TkAgg')  # Use TkAgg for SSH with X11 forwarding, or remove this
-                         # line if running directly through VS Code Remote Python.
 import matplotlib.pyplot as plt
 import board
 import busio
