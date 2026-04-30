@@ -52,7 +52,7 @@ direction = 'cw'
 
 try:
     while True:
-        motor.step(direction=direction, count=STEPS_PER_READ, mode='d', hold=True)
+        motor.step(direction=direction, count=STEPS_PER_READ, mode='d')
         step_count += STEPS_PER_READ
 
         reading = sensor.read()
