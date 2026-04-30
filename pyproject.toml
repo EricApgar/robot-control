@@ -24,6 +24,7 @@ dependencies = [
     "adafruit-circuitpython-motorkit>=1.6.20",
     "gpiozero>=2.0.1",
     "lgpio>=0.2.2.0",
+    "matplotlib>=3.0.0",
     "rpi-gpio>=0.7.1",
 ]
 
